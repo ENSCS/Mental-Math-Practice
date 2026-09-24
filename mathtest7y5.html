@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Edu+SA+Beginner:wght@400..700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
+        /* ตัวเลขลายมือ 0-9 (ทำเองด้วย Calligraphr) ตัวอื่นเช่น - ใช้ Tahoma แทน */
+        @font-face { font-family: 'Speednumber'; src: url('fonts/Speednumber-Regular.ttf') format('truetype'); font-display: swap; }
         @page {
             size: A4 landscape;
             margin: 5mm;
@@ -71,11 +73,11 @@
             padding: 4px 0;
             display: flex;
             flex-direction: column;
-            line-height: 1.15;
-            font-size: 20px;
-            font-family: 'Edu SA Beginner', cursive;
+            line-height: 23px; /* ล็อกระยะบรรทัดเท่าเดิม (เดิม 1.15 ของ 20px) */
+            font-size: 18px;
+            font-family: 'Speednumber', Tahoma, 'Edu SA Beginner', cursive;
             font-weight: 400;
-            font-style: italic;
+            font-style: normal;
             color: #000;
         }
 
