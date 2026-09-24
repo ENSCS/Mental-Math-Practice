@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>แบบฝึกหัดคูณเร็ว แม่ 2-9 (11-99) พิมพ์ได้เลย</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 1. ตั้งค่าพื้นฐานสำหรับการพิมพ์ */
+        @page {
+            size: A4 portrait;
+            margin: 15mm 12mm; /* กำหนดขอบกระดาษให้แน่นอน */
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        /* 2. Container สำหรับแต่ละหน้า A4 */
+        .page-container {
+            width: 210mm; /* ความกว้าง A4 */
+            min-height: 297mm; /* ความสูง A4 */
+            padding: 15mm 12mm;
+            margin: 10mm auto;
+            background: white;
+            position: relative;
+            /* คำสั่งสำคัญ: บังคับขึ้นหน้าใหม่หลังจบ div นี้ */
+            page-break-after: always;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* ซ่อนเงาและ Margin เมื่อสั่งพิมพ์จริง */
+        @media print {
+            body { background: none; }
+            .page-container {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                min-height: auto;
+            }
+        }
+
+        h1 { text-align: center; font-size: 18pt; margin: 0 0 15px 0; color: #222; }
+        h2 { text-align: center; font-size: 16pt; margin: 0 0 20px 0; color: #444; border-bottom: 2px solid #000; padding-bottom: 5px; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #000;
+            margin-bottom: -1px; /* ให้เส้นขอบซ้อนกัน */
+            height: 28px;
+        }
+
+        .prob-text {
+            flex: 1;
+            padding-left: 15px;
+            font-size: 13pt;
+        }
+
+        .ans-space {
+            width: 55px;
+            height: 100%;
+            border-left: 0px solid #000;
+        }
+
+        .ans-no {
+            width: 32px;
+            font-size: 10pt;
+            font-weight: bold;
+            padding-left: 5px;
+            color: #666;
+            border-right: 1px solid #ddd;
+        }
+
+        .ans-val {
+            flex: 1;
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="content-wrapper"></div>
+
+    <script>
+        function init() {
+            const wrapper = document.getElementById('content-wrapper');
+            
+            // วนลูปสร้างแม่ 2 ถึง 9
+            for (let multiplier = 2; multiplier <= 9; multiplier++) {
+                
+                // สุ่มตัวเลข 11-99 (89 ข้อ)
+                let numbers = [];
+                for (let i = 11; i <= 99; i++) numbers.push(i);
+                numbers.sort(() => Math.random() - 0.5);
+
+                // --- 1. สร้างหน้าโจทย์ ---
+                const probPage = document.createElement('div');
+                probPage.className = 'page-container';
+                probPage.innerHTML = `<h1>แบบฝึกหัดคูณเร็ว (คูณ ${multiplier})</h1>`;
+                probPage.appendChild(createGrid(numbers, multiplier, 'problem'));
+                wrapper.appendChild(probPage);
+                
+                // --- 2. สร้างหน้าเฉลย ---
+                /*
+                const ansPage = document.createElement('div');
+                ansPage.className = 'page-container';
+                ansPage.innerHTML = `<h2>เฉลย: แบบฝึกหัดคูณเร็ว (คูณ ${multiplier})</h2>`;
+                ansPage.appendChild(createGrid(numbers, multiplier, 'answer'));
+                wrapper.appendChild(ansPage);
+                */
+            }
+        }
+
+        function createGrid(data, multiplier, mode) {
+            const grid = document.createElement('div');
+            grid.className = 'grid-container';
+
+            for (let c = 0; c < 3; c++) {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'column';
+
+                for (let r = 0; r < 30; r++) {
+                    const idx = c * 30 + r;
+                    if (idx >= data.length) continue;
+
+                    const num = data[idx];
+                    const row = document.createElement('div');
+                    row.className = 'row-item';
+
+                    if (mode === 'problem') {
+                        row.innerHTML = `
+                            <div class="prob-text">${num} &nbsp; × &nbsp; ${multiplier} &nbsp; =</div>
+                            <div class="ans-space"></div>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <div class="ans-no">${idx + 1}.</div>
+                            <div class="ans-val">${num * multiplier}</div>
+                        `;
+                    }
+                    colDiv.appendChild(row);
+                }
+                grid.appendChild(colDiv);
+            }
+            return grid;
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>คณิตคิดเร็ว 8 ปี (1 min) Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+SA+Beginner:wght@400..700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        @page { size: A4 portrait; margin: 10mm; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
+        .container { width: 190mm; margin: auto; background: white; padding: 5mm 10mm; box-sizing: border-box; min-height: 277mm; }
+        
+        .header-info { border: 1px solid #000; padding: 8px; margin-bottom: 15px; text-align: center; position: relative; }
+        .score-box { position: absolute; right: 10px; top: 5px; border: 1px solid #000; width: 80px; height: 50px; font-size: 12px; }
+        .score-box div { border-bottom: 1px solid #000; padding: 2px; background: #eee; }
+
+        .grid-wrapper { margin-bottom: 5px; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            border-left: 1px solid #000;
+            border-top: 1px solid #000;
+        }
+
+        .problem-col {
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            justify-content: space-between; /* ช่วยดันช่องคำตอบให้ลงไปอยู่ล่างสุดเสมอ */
+        }
+
+        .first-row {
+            background-color: #aaa;
+            font-size: 11px;
+            border-bottom: 1px solid #000;
+            padding: 2px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .num-area {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+            font-size: 19px;
+            letter-spacing: 1px;
+            font-family: 'Edu SA Beginner', cursive;
+            font-weight: 400;
+            font-style: italic;
+            color: #000;
+            padding: 1px 0;
+            text-align: right;
+            padding-right: 10px;
+            min-height: 160px; /* กำหนดความสูงขั้นต่ำคงที่เพื่อให้ทุกช่องสูงเท่ากัน */
+            flex-grow: 1; 
+            justify-content: flex-start;
+        } 
+
+        .ans-line {
+            border-top: 1px solid #000;
+            height: 35px;
+            background: #fff;
+        }
+
+        /* สำหรับหน้าเฉลย */
+        .answer-section { margin-top: 40px; border-top: 3px double #000; padding-top: 20px; page-break-before: always; }
+        .answer-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: center; margin-bottom: 20px; }
+        .answer-table th { border: 1px solid #000; padding: 3px; width: 10%; font-size: 11px; }
+        .answer-table td { border: 1px solid #000; padding: 5px; width: 10%; font-size: 14px; }
+        .answer-table th { background-color: #aaa; }
+
+        .controls { position: fixed; top: 10px; right: 10px; z-index: 100; }
+        button { padding: 8px 15px; cursor: pointer; border: none; background: #e67e22; color: white; font-weight: bold; border-radius: 4px; margin-left: 5px;}
+
+        @media print {
+            .controls { display: none; }
+            body { background: white; }
+            .container { width: 100%; padding: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button onclick="window.location.reload()">สุ่มโจทย์ใหม่</button>
+    <button onclick="window.print()" style="background:#2980b9;">พิมพ์ PDF</button>
+</div>
+
+<div class="container">
+    <div class="header-info">
+        <div id="head-title-1" style="font-size: 14px; font-weight: bold;">คณิตคิดเร็ว 8 ปี (1 min) Test</div>
+        <div id="head-title-2" style="font-size: 12px;">Time limit: 1 minutes | 40 Questions each 2 points</div>
+    </div>
+
+    <div id="main-content"></div>
+
+    <div class="answer-section">
+        <div id="answer-key-title" style="font-weight: bold; margin-bottom: 10px;">Answer Key</div>
+        <div id="ans-tables-container"></div>
+    </div>
+</div>
+
+<script>
+
+    function applyTimestamp() {
+        const now = new Date();
+        const yy = now.getFullYear().toString().slice(-2);
+        const tempDate = new Date(now.valueOf());
+        tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+        const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+        const ww = Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7).toString().padStart(2, '0');
+        const dNum = now.getDay();
+        const d = (dNum === 0) ? 7 : dNum;
+        const hour = now.getHours();
+        const h = (hour === 0) ? "Z" : String.fromCharCode(64 + hour);
+        const mm = now.getMinutes().toString().padStart(2, '0');
+        const ss = now.getSeconds().toString().padStart(2, '0');
+        const timestamp = `${yy}${ww}-${d}${h}-${mm}${ss}`;
+
+        document.title = `คณิตคิดเร็ว 8 ปี (1 min) Test id ${timestamp}`;
+        document.getElementById('head-title-1').innerText = `คณิตคิดเร็ว รุ่นอายุ 8 ปี [ Test id : ${timestamp} ] .: by ENS :. No copyright, not for commercial use`;
+        document.getElementById('answer-key-title').innerText = `Answer Key [ Test id : ${timestamp} ]`;
+    }
+
+    applyTimestamp();
+
+    const allAnswers = [];
+
+    function generateProblems() {
+        const mainContent = document.getElementById('main-content');
+        let questionNo = 1;
+
+        for (let rowBlock = 0; rowBlock < 4; rowBlock++) {
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'grid-container';
+            gridContainer.style.marginBottom = "8px"; // ปรับให้แต่ละแถวห่างน้อยลง
+
+            for (let col = 1; col <= 10; col++) {
+                let nums = [];
+                let res = -1;
+                const isSingleDigit = col <= 5;
+
+                while (res < 0) {
+                    nums = [];
+                    let curr = 0;
+                    let minusCount = 0;
+
+                    if (isSingleDigit) {
+                        // 5 ข้อแรก: 1 หลัก 8 บรรทัด (เหมือนเดิม)
+                        for (let i = 0; i < 8; i++) {
+                            let v = Math.floor(Math.random() * 9) + 1;
+                            if (i === 0) { curr = v; nums.push(v); }
+                            else {
+                                if (minusCount < 2 && Math.random() < 0.3 && (curr - v >= 0)) {
+                                    curr -= v; nums.push(-v); minusCount++;
+                                } else { curr += v; nums.push(v); }
+                            }
+                        }
+                    } else {
+                        // 5 ข้อหลัง: เลข 2 หลัก 3 ตัว และเลข 1 หลัก 2 ตัว
+                        let types = [2, 2, 2, 1, 1]; 
+                        types = types.sort(() => Math.random() - 0.5);
+
+                        for (let i = 0; i < 5; i++) {
+                            let v;
+                            if (types[i] === 2) {
+                                v = Math.floor(Math.random() * 90) + 10;
+                            } else {
+                                v = Math.floor(Math.random() * 9) + 1;
+                            }
+
+                            if (i === 0) { 
+                                curr = v; 
+                                nums.push(v); 
+                            } else {
+                                // เงื่อนไขใหม่: ลบได้เฉพาะเลข 2 หลัก (types[i] === 2) และไม่เกิน 1 ตัว
+                                if (types[i] === 2 && minusCount < 1 && Math.random() < 0.4 && (curr - v >= 0)) {
+                                    curr -= v; 
+                                    nums.push(-v); 
+                                    minusCount++;
+                                } else { 
+                                    curr += v; 
+                                    nums.push(v); 
+                                }
+                            }
+                        }
+                    }
+                    res = curr;
+                }
+
+                allAnswers.push({ no: questionNo, val: res });
+
+                const colDiv = document.createElement('div');
+                colDiv.className = 'problem-col';
+                let numHtml = nums.map(n => `<span>${n < 0 ? '-' + Math.abs(n) : n}</span>`).join('');
+                
+                colDiv.innerHTML = `
+                    <div class="first-row">${questionNo}</div>
+                    <div class="num-area">${numHtml}</div>
+                    <div class="ans-line"></div>
+                `;
+                gridContainer.appendChild(colDiv);
+                questionNo++;
+            }
+            mainContent.appendChild(gridContainer);
+        }
+    }
+
+    function renderAnswers() {
+        const container = document.getElementById('ans-tables-container');
+        // สร้าง 4 ตาราง แยกตามแถว แถวละ 10 ข้อ
+        for (let r = 0; r < 4; r++) {
+            const table = document.createElement('table');
+            table.className = 'answer-table';
+            
+            const rowNo = document.createElement('tr');
+            const rowVal = document.createElement('tr');
+            
+            const start = r * 10;
+            for (let i = start; i < start + 10; i++) {
+                const tdNo = document.createElement('th');
+                tdNo.innerText = allAnswers[i].no;
+                rowNo.appendChild(tdNo);
+
+                const tdVal = document.createElement('td');
+                tdVal.innerText = allAnswers[i].val;
+                rowVal.appendChild(tdVal);
+            }
+            table.appendChild(rowNo);
+            table.appendChild(rowVal);
+            container.appendChild(table);
+        }
+    }
+
+    generateProblems();
+    renderAnswers();
+</script>
+</body>
+</html>

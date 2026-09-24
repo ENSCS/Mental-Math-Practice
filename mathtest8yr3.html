@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>คณิตคิดเร็ว 8 ปี (แถว 3) Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+SA+Beginner:wght@400..700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        @page { size: A4 landscape; margin: 5mm; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
+        .container { width: 285mm; margin: auto; background: white; padding: 5mm; box-sizing: border-box; }
+        .section-box { margin-bottom: 10px; }
+        .section-title { font-size: 16px; font-weight: bold; padding: 2px 10px; color: #545454; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            border-left: 1px solid #000;
+            border-top: 1px solid #000;
+        }
+
+        .problem-col {
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .first-row {
+            background-color: #aaa;
+            font-size: 11px;
+            border-bottom: 1px solid #000;
+            padding: 2px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .num-area {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2; /* ปรับให้ตัวเลขชิดกันพอดี */
+            font-size: 19px;
+            letter-spacing: 1px;
+            font-family: 'Edu SA Beginner', cursive;
+            font-weight: 400;
+            font-style: italic;
+            color: #000;
+            padding: 2px 0; /* ระยะห่างบน-ล่างของกลุ่มตัวเลข */
+            text-align: center;
+            flex-grow: 1; /* ดันให้พื้นที่ยืดหยุ่น */
+            justify-content: flex-start; /* เริ่มจากด้านบน */
+        }
+
+        /* บังคับความสูงเฉพาะ Grid 3 ให้เท่ากันเพื่อความสวยงามของเส้นตาราง */
+        #grid3 .num-area {
+            /*min-height: 200px; */
+        }
+
+        .ans-line {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            height: 26px;
+            background: #fff;
+        }
+
+        .answer-section { margin-top: 25px; border-top: 3px double #000; padding-top: 10px; }
+        .answer-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: center; table-layout: fixed; }
+        .answer-table th, .answer-table td { border: 1px solid #000; padding: 3px; }
+        .answer-table th { background-color: #aaa; }
+        .page-label { background-color: #aaa !important; font-weight: bold; width: 60px; }
+
+        .controls { position: fixed; top: 10px; right: 10px; z-index: 100; }
+        button { padding: 8px 15px; cursor: pointer; border: none; background: #e67e22; color: white; font-weight: bold; border-radius: 4px; }
+
+        @media print {
+            .controls { display: none; }
+            body { background: white; }
+            .container { width: 100%; padding: 0; }
+            .answer-section { page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button onclick="window.location.reload()">สุ่มโจทย์ใหม่</button>
+    <button onclick="window.print()" style="background:#2980b9;">พิมพ์ PDF</button>
+</div>
+
+<div class="container">
+    <div class="section-box">
+        <div id="section-title-1" class="section-title">คณิตคิดเร็ว รุ่นอายุ 8 ปี (แถว 3)</div>
+        <div id="grid1" class="grid-container"></div>
+    </div>
+
+    <div class="section-box">
+        <div id="grid2" class="grid-container"></div>
+    </div>
+
+    <div class="section-box">
+        <div id="grid3" class="grid-container"></div>
+    </div>
+
+    <div class="answer-section">
+        <div id="answer-key-title" style="font-weight: bold; margin-bottom: 5px;">Answer Key</div>
+        <table class="answer-table">
+            <thead><tr id="thr-1"><th class="page-label">No.</th></tr></thead>
+            <tbody id="ans-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function applyTimestamp() {
+        const now = new Date();
+        const yy = now.getFullYear().toString().slice(-2);
+        const tempDate = new Date(now.valueOf());
+        tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+        const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+        const ww = Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7).toString().padStart(2, '0');
+        const dNum = now.getDay();
+        const d = (dNum === 0) ? 7 : dNum;
+        const hour = now.getHours();
+        const h = (hour === 0) ? "Z" : String.fromCharCode(64 + hour);
+        const mm = now.getMinutes().toString().padStart(2, '0');
+        const ss = now.getSeconds().toString().padStart(2, '0');
+        const timestamp = `${yy}${ww}-${d}${h}-${mm}${ss}`;
+
+        document.title = `คณิตคิดเร็ว 8 ปี (แถว 3) Test id ${timestamp}`;
+        document.getElementById('section-title-1').innerText = `คณิตคิดเร็ว รุ่นอายุ 8 ปี (แถว 3) [ Test id : ${timestamp} ] .: by ENS :. No copyright, not for commercial use`;
+        document.getElementById('answer-key-title').innerText = `Answer Key [ Test id : ${timestamp} ]`;
+    }
+
+    applyTimestamp();
+
+    const allAnswers = [];
+
+    function generate(containerId, startNo, defaultRows, defaultMaxMinus) {
+        const container = document.getElementById(containerId);
+        const sectionAns = [];
+        
+        for (let i = 0; i < 20; i++) {
+            const currentNo = startNo + i;
+            let nums = [];
+            let res = -1;
+            const isSpecial = (currentNo >= 46 && currentNo <= 50) || (currentNo >= 56 && currentNo <= 60) || (currentNo >= 6 && currentNo <= 10)  || (currentNo >= 16 && currentNo <= 20) || (currentNo >= 26 && currentNo <= 30) || (currentNo >= 36 && currentNo <= 40);
+
+            while (res < 0) {
+                nums = [];
+                let curr = 0;
+                let minusCount = 0;
+
+                if (isSpecial) {
+                    let pool = [2, 2, 2, 1, 1].sort(() => Math.random() - 0.5);
+                    for (let j = 0; j < 5; j++) {
+                        let val = (pool[j] === 2) ? Math.floor(Math.random() * 90) + 10 : Math.floor(Math.random() * 9) + 1;
+                        if (j === 0) { curr = val; nums.push(val); }
+                        else {
+                            if (minusCount < 1 && Math.random() < 0.3 && (curr - val >= 0)) {
+                                curr -= val; nums.push(-val); minusCount++;
+                            } else { curr += val; nums.push(val); }
+                        }
+                    }
+                } else {
+                    curr = Math.floor(Math.random() * 9) + 1;
+                    nums.push(curr);
+                    for (let r = 1; r < defaultRows; r++) {
+                        let v = Math.floor(Math.random() * 9) + 1;
+                        if (minusCount < defaultMaxMinus && Math.random() < 0.35 && (curr - v >= 0)) {
+                            curr -= v; nums.push(-v); minusCount++;
+                        } else { curr += v; nums.push(v); }
+                    }
+                }
+                res = curr;
+            }
+
+            sectionAns.push(res);
+            const col = document.createElement('div');
+            col.className = 'problem-col';
+            let numHtml = nums.map(n => `<span>${n < 0 ? '-' + Math.abs(n) : n}</span>`).join('');
+            
+            col.innerHTML = `
+                <div class="first-row">${currentNo}</div>
+                <div class="num-area">${numHtml}</div>
+                <div class="ans-line"></div>
+            `;
+            container.appendChild(col);
+        }
+        allAnswers.push(sectionAns);
+    }
+
+    generate('grid1', 1, 8, 2);
+    generate('grid2', 21, 8, 2);
+    generate('grid3', 41, 8, 2);
+
+
+    const thr = document.getElementById('thr-1');
+    for(let i=1; i<=20; i++) {
+        const th = document.createElement('th');
+        th.innerText = i;
+        thr.appendChild(th);
+    }
+
+    const ansBody = document.getElementById('ans-body');
+    allAnswers.forEach((group, idx) => {
+        const row = document.createElement('tr');
+        const labelTd = document.createElement('td');
+        labelTd.className = 'page-label';
+        labelTd.innerText = (idx === 0) ? "1-20" : (idx === 1 ? "21-40" : "41-60");
+        row.appendChild(labelTd);
+        group.forEach(v => {
+            const td = document.createElement('td');
+            td.innerText = v;
+            row.appendChild(td);
+        });
+        ansBody.appendChild(row);
+    });
+</script>
+</body>
+</html>

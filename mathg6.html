@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>โจทย์ฝึก ข้อสอบวัดระดับ รุ่น GRADE 6 (60 ข้อ 5 นาที)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+SA+Beginner:wght@400..700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ตัวเลขลายมือ 0-9 (ทำเองด้วย Calligraphr) ตัวอื่นเช่น , - ใช้ Edu SA Beginner แทน */
+        @font-face { font-family: 'Speednumber'; src: url('fonts/Speednumber-Regular.ttf') format('truetype'); font-display: swap; }
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+        * { box-sizing: border-box; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+        
+        .page { 
+            width: 297mm; 
+            min-height: 210mm; 
+            padding: 10mm; 
+            margin: 10mm auto; 
+            background: white; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+        }
+        
+        .page-break { page-break-before: always; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 16px; 
+            font-weight: bold; 
+            border-bottom: 2px solid #000; 
+            padding-bottom: 5px; 
+            margin-bottom: 15px; 
+        }
+        
+        /* ส่วนคูณและหาร */
+        .top-section { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+            margin-bottom: 25px; 
+        }
+        .sub-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            border: 1px solid #000; 
+        }
+        table { width: 100%; border-collapse: collapse; }
+        td { border: 1px solid #000; height: 28px; font-size: 17px; padding: 0; }
+        
+        .no { width: 35px; font-family: Arial; text-align: center; background: #eee; font-size: 12px; }
+        
+        /* ปรับปรุงส่วนแสดงโจทย์: เอาเส้นขอบขวาออก */
+        .td-ques {
+            border-right: none;
+        }
+        
+        .ques-container {
+            display: flex;
+            width: 100%;
+            padding: 0 5px 0 10px;
+            font-family: 'Speednumber', Tahoma, 'Edu SA Beginner';
+            font-size: 17px;
+            font-weight: 400;
+            font-style: normal;
+        }
+        .math-text { flex: 1; text-align: left; letter-spacing: 1px; }
+        .equal-sign { width: 15px; text-align: right; font-family: Arial;}
+
+        /* ปรับปรุงส่วนช่องคำตอบ: เอาเส้นขอบซ้ายออก */
+        .ans-space { 
+            border-left: none;
+            width: 70px;
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 18px;
+            padding-right: 5px;
+        }
+
+        /* ส่วนบวกลบแนวตั้ง (จินตคณิต) */
+        .bottom-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; }
+        .abacus-grid { 
+            display: grid; 
+            grid-template-columns: repeat(20, 1fr); 
+            border-top: 1.5px solid #000; 
+            border-left: 1.5px solid #000; 
+        }
+        .abacus-col { 
+            display: flex; 
+            flex-direction: column; 
+            border-right: 1.5px solid #000; 
+            border-bottom: 1.5px solid #000; 
+            text-align: center; 
+        }
+        .col-head { background: #eee; border-bottom: 1.5px solid #000; padding: 3px 0; font-family: Arial; font-size: 12px; }
+        .num-row { font-family: 'Speednumber', Tahoma, 'Edu SA Beginner'; font-size: 17px; letter-spacing: 1px; font-weight: 400; font-style: normal; height: 26px; display: flex; align-items: center; justify-content: right;padding-right: 6px;}
+        .ans-box { 
+            border-top: 2.5px solid #000; 
+            height: 45px; 
+            background: #fff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            font-size: 20px;
+        }
+
+        .ans-text { color: blue; }
+
+        .controls { position: fixed; top: 10px; right: 10px; z-index: 100; }
+        button { padding: 8px 15px; cursor: pointer; border: none; background: #e67e22; color: white; font-weight: bold; border-radius: 4px; }
+
+        @media print {
+            .controls { display: none; }
+            body { background: none; }
+            .page { margin: 0; box-shadow: none; border: none; }
+            @page { size: A4 landscape; margin: 0; }
+            .no, .col-head { background: #eee !important; -webkit-print-color-adjust: exact; }
+            .ans-text { color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button onclick="window.location.reload()">สุ่มโจทย์ใหม่</button>
+    <button onclick="window.print()" style="background:#2980b9;">พิมพ์ PDF</button>
+</div>
+
+<div id="content-container"></div>
+
+<script>
+    let globalTimestamp = "";
+    function applyTimestamp() {
+        const now = new Date();
+        const yy = now.getFullYear().toString().slice(-2);
+        const tempDate = new Date(now.valueOf());
+        tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+        const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+        const ww = Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7).toString().padStart(2, '0');
+        const dNum = now.getDay();
+        const d = (dNum === 0) ? 7 : dNum;
+        const hour = now.getHours();
+        const h = (hour === 0) ? "Z" : String.fromCharCode(64 + hour);
+        const mm = now.getMinutes().toString().padStart(2, '0');
+        const ss = now.getSeconds().toString().padStart(2, '0');
+        const timestamp = `${yy}${ww}-${d}${h}-${mm}${ss}`;
+
+        document.title = `วัดระดับg6 Test id ${timestamp}`;
+        globalTimestamp = `${yy}${ww}-${d}${h}-${mm}${ss}`;
+    }
+
+    applyTimestamp();
+
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const allData = { mult: [], div: [], abacus: [] };
+
+    const fmt = n => n.toLocaleString('en-US');
+
+    function generateProblemData() {
+        // คูณ 1-20: เลข 3 หลัก x เลข 1 หลัก
+        for(let i=1; i<=20; i++) {
+            let n1 = rand(100, 999), n2 = rand(2, 9);
+            allData.mult.push({ id: i, n1, n2, ans: n1 * n2 });
+        }
+        // หาร 21-40: หารลงตัว ผลลัพธ์ส่วนใหญ่ 3 หลัก บางข้อ 2 หลัก (ตัวตั้งไม่เกิน 4 หลัก)
+        for(let i=21; i<=40; i++) {
+            let n2 = rand(2, 9);
+            let ans = Math.random() < 0.2 ? rand(11, 99) : rand(100, Math.min(999, Math.floor(9999 / n2)));
+            allData.div.push({ id: i, n1: ans * n2, n2, ans });
+        }
+        // บวกลบ 41-60: เลข 2 หลัก, ข้อ 41-51 มี 8 แถว, 52-60 มี 9 แถว
+        // ในแต่ละชุด 5 ข้อ คอลัมน์ที่ 2 และ 4 มีเลขลบ 3 ตัว ที่เหลือบวกล้วน
+        for(let i=41; i<=60; i++) {
+            const rowCount = (i <= 51 ? 8 : 9);
+            const pos = (i - 41) % 5;
+            const minusCount = (pos === 1 || pos === 3) ? 3 : 0;
+            let rows;
+            while(true) {
+                // สุ่มตำแหน่งแถวที่เป็นลบ (ไม่ใช่แถวแรก)
+                const minusRows = new Set();
+                while(minusRows.size < minusCount) minusRows.add(rand(1, rowCount - 1));
+                let sum = 0, ok = true;
+                rows = [];
+                for(let r=0; r<rowCount; r++) {
+                    let v = rand(10, 99);
+                    if(minusRows.has(r)) v = -v;
+                    sum += v;
+                    if(sum < 0) { ok = false; break; }
+                    rows.push(v);
+                }
+                if(ok) break;
+            }
+            allData.abacus.push({ id: i, rows, ans: rows.reduce((a, b) => a + b, 0) });
+        }
+    }
+
+    function createPageHTML(isAnswerKey) {
+        const prefix = isAnswerKey ? 'ans' : 'q';
+        return `
+        <div class="page ${isAnswerKey ? 'page-break' : ''}">
+            <div class="header">
+                <span>${isAnswerKey ? 'เฉลย: ' : ''}โจทย์ฝึก ข้อสอบวัดระดับ รุ่น GRADE 6 (บวก ลบ คูณ หาร 60 ข้อ 5 นาที)</span>
+                <span>จงหาผลคูณและหารต่อไปนี้ (ข้อละ 1 คะแนน)</span>
+                <span>${isAnswerKey ? 'เฉลย: ' : '' }Test id ${globalTimestamp}</span>
+            </div>
+            <div class="top-section">
+                <div class="sub-grid"><table id="${prefix}-col1"></table><table id="${prefix}-col2"></table></div>
+                <div class="sub-grid"><table id="${prefix}-col3"></table><table id="${prefix}-col4"></table></div>
+            </div>
+            <div class="bottom-title">จงบวกลบเลขต่อไปนี้แล้วเขียนคำตอบลงในช่องว่างข้างล่าง (ข้อละ 2 คะแนน) .: by ENS :. No copyright, not for commercial use</div>
+            <div class="abacus-grid" id="${prefix}-abacus"></div>
+        </div>`;
+    }
+
+    function fillPageContent(isAnswerKey) {
+        const prefix = isAnswerKey ? 'ans' : 'q';
+        
+        allData.mult.forEach(p => {
+            let target = document.getElementById(`${prefix}-col${p.id <= 10 ? '1' : '2'}`);
+            target.innerHTML += `
+                <tr>
+                    <td class="no">${p.id}</td>
+                    <td class="td-ques">
+                        <div class="ques-container">
+                            <span class="math-text">${p.n1} &times; ${p.n2}</span>
+                            <span class="equal-sign">=</span>
+                        </div>
+                    </td>
+                    <td class="ans-space">${isAnswerKey ? '<span class="ans-text">'+fmt(p.ans)+'</span>' : ''}</td>
+                </tr>`;
+        });
+
+        allData.div.forEach(p => {
+            let target = document.getElementById(`${prefix}-col${p.id <= 30 ? '3' : '4'}`);
+            target.innerHTML += `
+                <tr>
+                    <td class="no">${p.id}</td>
+                    <td class="td-ques">
+                        <div class="ques-container">
+                            <span class="math-text">${fmt(p.n1)} &divide; ${p.n2}</span>
+                            <span class="equal-sign">=</span>
+                        </div>
+                    </td>
+                    <td class="ans-space">${isAnswerKey ? '<span class="ans-text">'+fmt(p.ans)+'</span>' : ''}</td>
+                </tr>`;
+        });
+
+        allData.abacus.forEach(p => {
+            let rowsHtml = p.rows.map(v => `<div class="num-row">${v}</div>`).join('');
+            if(p.id <= 51) rowsHtml += `<div class="num-row"></div>`;
+            document.getElementById(`${prefix}-abacus`).innerHTML += `
+                <div class="abacus-col">
+                    <div class="col-head">${p.id}</div>
+                    ${rowsHtml}
+                    <div class="ans-box">${isAnswerKey ? '<span class="ans-text">'+p.ans+'</span>' : ''}</div>
+                </div>`;
+        });
+    }
+
+    window.onload = () => {
+        generateProblemData();
+        const container = document.getElementById('content-container');
+        container.innerHTML += createPageHTML(false);
+        fillPageContent(false);
+        container.innerHTML += createPageHTML(true);
+        fillPageContent(true);
+    };
+</script>
+</body>
+</html>
