@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>แบบฝึกหัดคูณ 3 หลัก (160 ข้อ)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+SA+Beginner:wght@400..700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ตัวเลขลายมือ 0-9 (ทำเองด้วย Calligraphr) ตัวอื่นเช่น × ใช้ Tahoma แทน */
+        @font-face { font-family: 'Speednumber'; src: url('fonts/Speednumber-Regular.ttf') format('truetype'); font-display: swap; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            padding: 8mm 8mm 6mm;
+            margin: 10mm auto;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .page-break { page-break-before: always; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 15px;
+            font-weight: bold;
+            border-bottom: 2px solid #000;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+        }
+        .header .sub { font-size: 12px; font-weight: normal; }
+
+        /* 4 คอลัมน์ คอลัมน์ละ 40 ข้อ */
+        .cols {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2mm;
+        }
+        .col { display: flex; flex-direction: column; }
+
+        table { width: 100%; border-collapse: collapse; border: 1.5px solid #000; table-layout: fixed; }
+        td { border: 1px solid #000; height: 6mm; padding: 0; }
+
+        .no { width: 8mm; font-family: Arial; text-align: center; background: #eee; font-size: 10px; font-weight: bold; }
+        .num {
+            font-family: 'Speednumber', Tahoma, 'Edu SA Beginner';
+            font-size: 16px;
+            font-weight: 400;
+            font-style: normal;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .n1 { width: 11mm; }
+        .op { width: 5mm; font-family: Tahoma, sans-serif; font-size: 12px; text-align: center; }
+        .n2 { width: 5mm; }
+        .ans { text-align: center; }
+        .ans-text { color: blue; font-family: 'Sarabun', sans-serif; font-weight: bold; font-size: 14px; }
+
+        /* กล่องจดเวลา นาที:วินาที ใต้แต่ละคอลัมน์ */
+        .timer-row { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin-top: 4px; font-size: 13px; }
+        .timer-box { width: 24mm; height: 7mm; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 15px; }
+
+        .footer-note { font-size: 10px; color: #555; margin-top: auto; }
+
+        .controls { position: fixed; top: 10px; right: 10px; z-index: 100; display: flex; gap: 6px; align-items: center; background: rgba(255,255,255,0.9); padding: 6px; border-radius: 6px; font-size: 14px; }
+        select { font-size: 14px; padding: 5px; }
+        button { padding: 8px 15px; cursor: pointer; border: none; background: #e67e22; color: white; font-weight: bold; border-radius: 4px; }
+
+        @media print {
+            .controls { display: none; }
+            body { background: none; }
+            .page { margin: 0; box-shadow: none; border: none; }
+            @page { size: A4 portrait; margin: 0; }
+            .no { background: #eee !important; -webkit-print-color-adjust: exact; }
+            .ans-text { color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <label for="multiplier">คอลัมน์ 1–3 คูณด้วย</label>
+    <select id="multiplier" onchange="render()">
+        <option value="2" selected>× 2</option>
+        <option value="3">× 3</option>
+        <option value="4">× 4</option>
+        <option value="5">× 5</option>
+        <option value="6">× 6</option>
+        <option value="7">× 7</option>
+        <option value="8">× 8</option>
+        <option value="9">× 9</option>
+    </select>
+    <button onclick="render()">สุ่มโจทย์ใหม่</button>
+    <button onclick="window.print()" style="background:#2980b9;">พิมพ์ PDF</button>
+</div>
+
+<div id="content-container"></div>
+
+<script>
+    function makeTimestamp() {
+        const now = new Date();
+        const yy = now.getFullYear().toString().slice(-2);
+        const tempDate = new Date(now.valueOf());
+        tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+        const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+        const ww = Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7).toString().padStart(2, '0');
+        const dNum = now.getDay();
+        const d = (dNum === 0) ? 7 : dNum;
+        const hour = now.getHours();
+        const h = (hour === 0) ? "Z" : String.fromCharCode(64 + hour);
+        const mm = now.getMinutes().toString().padStart(2, '0');
+        const ss = now.getSeconds().toString().padStart(2, '0');
+        return `${yy}${ww}-${d}${h}-${mm}${ss}`;
+    }
+
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const fmt = n => n.toLocaleString('en-US');
+    const COLS = 4, PER_COL = 40;
+    let columns = [], timestamp = '', multiplier = 2;
+
+    // ตัวตั้ง 100-999 ไม่ซ้ำในคอลัมน์เดียวกัน
+    // คอลัมน์ 1-3 คูณด้วยแม่ที่เลือก คอลัมน์ 4 คละตัวคูณ 2-9
+    function generateProblemData() {
+        columns = [];
+        for (let c = 0; c < COLS; c++) {
+            const used = new Set(), problems = [];
+            while (problems.length < PER_COL) {
+                const n1 = rand(100, 999);
+                if (used.has(n1)) continue;
+                used.add(n1);
+                const n2 = c < COLS - 1 ? multiplier : rand(2, 9);
+                problems.push({ id: c * PER_COL + problems.length + 1, n1, n2, ans: n1 * n2 });
+            }
+            columns.push(problems);
+        }
+    }
+
+    function createPageHTML(isAnswerKey) {
+        const colsHtml = columns.map(problems => `
+            <div class="col">
+                <table>${problems.map(p => `
+                    <tr>
+                        <td class="no">${p.id}</td>
+                        <td class="num n1">${p.n1}</td>
+                        <td class="op">&times;</td>
+                        <td class="num n2">${p.n2}</td>
+                        <td class="ans">${isAnswerKey ? '<span class="ans-text">' + fmt(p.ans) + '</span>' : ''}</td>
+                    </tr>`).join('')}
+                </table>
+                <div class="timer-row">เวลา <div class="timer-box">:</div></div>
+            </div>`).join('');
+
+        return `
+        <div class="page ${isAnswerKey ? 'page-break' : ''}">
+            <div class="header">
+                <span>${isAnswerKey ? 'เฉลย: ' : ''}แบบฝึกหัดคูณ 3 หลัก <span class="sub">(คอลัมน์ 1–3 คูณ ${multiplier}, คอลัมน์ 4 คละ 2–9)</span></span>
+                <span>${isAnswerKey ? 'เฉลย: ' : ''}Test id ${timestamp}</span>
+            </div>
+            <div class="cols">${colsHtml}</div>
+            <div class="footer-note">.: by ENS :. No copyright, not for commercial use</div>
+        </div>`;
+    }
+
+    function render() {
+        multiplier = parseInt(document.getElementById('multiplier').value, 10);
+        timestamp = makeTimestamp();
+        document.title = `คูณ 3 หลัก x${multiplier} Test id ${timestamp}`;
+        generateProblemData();
+        document.getElementById('content-container').innerHTML = createPageHTML(false) + createPageHTML(true);
+    }
+
+    window.onload = render;
+</script>
+</body>
+</html>
