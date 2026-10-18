@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>แบบฝึกหัดหารด้วยเลข 2 หลัก (30 ข้อ 3 นาที)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+SA+Beginner:wght@400..700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ตัวเลขลายมือ 0-9 (ทำเองด้วย Calligraphr) ตัวอื่นเช่น , ÷ = ใช้ Tahoma แทน */
+        @font-face { font-family: 'Speednumber'; src: url('fonts/Speednumber-Regular.ttf') format('truetype'); font-display: swap; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+
+        .page {
+            width: 297mm;
+            height: 210mm;
+            padding: 10mm;
+            margin: 10mm auto;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .page-break { page-break-before: always; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* 2 ชุดวางซ้าย-ขวา */
+        .sets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8mm;
+            flex: 1;
+        }
+        .set { display: flex; flex-direction: column; }
+        .set-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+
+        table { width: 100%; border-collapse: collapse; border: 2px solid #000; }
+        td { border: 1px solid #000; height: 10mm; padding: 0; }
+
+        .no { width: 30px; font-family: Arial; text-align: center; background: #eee; font-size: 12px; font-weight: bold; }
+
+        .ques {
+            padding-left: 8px;
+            font-family: 'Speednumber', Tahoma, 'Edu SA Beginner';
+            font-size: 22px;
+            font-weight: 400;
+            font-style: normal;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        /* ตัวตั้งชิดขวาในความกว้างเท่ากัน ให้เครื่องหมาย ÷ ตรงแนวเดียวกันทุกข้อ */
+        .dividend { display: inline-block; min-width: 3.4em; text-align: right; }
+        .ans-text { color: blue; font-family: 'Sarabun', sans-serif; font-weight: bold; font-size: 18px; letter-spacing: 0; margin-left: 6px; }
+
+        /* กล่องจดเวลา นาที:วินาที */
+        .timer-row { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 6px; font-size: 15px; }
+        .timer-box { width: 42mm; height: 9mm; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+
+        .footer-note { font-size: 11px; color: #555; margin-top: 4px; }
+
+        .controls { position: fixed; top: 10px; right: 10px; z-index: 100; }
+        button { padding: 8px 15px; cursor: pointer; border: none; background: #e67e22; color: white; font-weight: bold; border-radius: 4px; }
+
+        @media print {
+            .controls { display: none; }
+            body { background: none; }
+            .page { margin: 0; box-shadow: none; border: none; }
+            @page { size: A4 landscape; margin: 0; }
+            .no { background: #eee !important; -webkit-print-color-adjust: exact; }
+            .ans-text { color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button onclick="window.location.reload()">สุ่มโจทย์ใหม่</button>
+    <button onclick="window.print()" style="background:#2980b9;">พิมพ์ PDF</button>
+</div>
+
+<div id="content-container"></div>
+
+<script>
+    let globalTimestamp = "";
+    function applyTimestamp() {
+        const now = new Date();
+        const yy = now.getFullYear().toString().slice(-2);
+        const tempDate = new Date(now.valueOf());
+        tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+        const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+        const ww = Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7).toString().padStart(2, '0');
+        const dNum = now.getDay();
+        const d = (dNum === 0) ? 7 : dNum;
+        const hour = now.getHours();
+        const h = (hour === 0) ? "Z" : String.fromCharCode(64 + hour);
+        const mm = now.getMinutes().toString().padStart(2, '0');
+        const ss = now.getSeconds().toString().padStart(2, '0');
+        const timestamp = `${yy}${ww}-${d}${h}-${mm}${ss}`;
+
+        document.title = `หาร 2 หลัก Test id ${timestamp}`;
+        globalTimestamp = timestamp;
+    }
+
+    applyTimestamp();
+
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const fmt = n => n.toLocaleString('en-US');
+    const SET_COUNT = 2, PER_SET = 30, PER_COL = 15;
+    const sets = [];
+
+    // ผลหาร 10-99 และตัวหาร 10-99 แล้วตั้งตัวตั้ง = ผลหาร × ตัวหาร จึงหารลงตัวเสมอ
+    function generateProblemData() {
+        for (let s = 0; s < SET_COUNT; s++) {
+            const used = new Set(), problems = [];
+            while (problems.length < PER_SET) {
+                const ans = rand(10, 99), n2 = rand(10, 99);
+                const n1 = ans * n2;
+                // ข้อเดียวกันห้ามซ้ำในชุด
+                if (used.has(n1 + '/' + n2)) continue;
+                used.add(n1 + '/' + n2);
+                problems.push({ id: problems.length + 1, n1, n2, ans });
+            }
+            sets.push(problems);
+        }
+    }
+
+    function createPageHTML(isAnswerKey) {
+        const setsHtml = sets.map((problems, s) => {
+            let rows = '';
+            for (let r = 0; r < PER_COL; r++) {
+                rows += '<tr>' + [problems[r], problems[r + PER_COL]].map(p => `
+                    <td class="no">${p.id}</td>
+                    <td class="ques"><span class="dividend">${fmt(p.n1)}</span> &divide; ${p.n2} =${isAnswerKey ? '<span class="ans-text">' + p.ans + '</span>' : ''}</td>`).join('') + '</tr>';
+            }
+            return `
+            <div class="set">
+                <div class="set-title">ชุดที่ ${s + 1} &nbsp;—&nbsp; 30 ข้อ ภายในเวลา 3 นาที</div>
+                <table>${rows}</table>
+                <div class="timer-row">เวลา <div class="timer-box">:</div></div>
+            </div>`;
+        }).join('');
+
+        return `
+        <div class="page ${isAnswerKey ? 'page-break' : ''}">
+            <div class="header">
+                <span>${isAnswerKey ? 'เฉลย: ' : ''}แบบฝึกหัดหารด้วยเลข 2 หลัก (30 ข้อ 3 นาที)</span>
+                <span>${isAnswerKey ? 'เฉลย: ' : ''}Test id ${globalTimestamp}</span>
+            </div>
+            <div class="sets">${setsHtml}</div>
+            <div class="footer-note">.: by ENS :. No copyright, not for commercial use</div>
+        </div>`;
+    }
+
+    window.onload = () => {
+        generateProblemData();
+        const container = document.getElementById('content-container');
+        container.innerHTML = createPageHTML(false) + createPageHTML(true);
+    };
+</script>
+</body>
+</html>
